@@ -1,0 +1,5 @@
+# Generated for Supabase CLI (optional local dev).
+# Link your project: supabase link --project-ref <ref>
+
+[functions.add-project-member]
+verify_jwt = true

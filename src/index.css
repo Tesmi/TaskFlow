@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --surface: 248 250 252;
+  --surface-muted: 241 245 249;
+  --ink: 15 23 42;
+  --ink-muted: 100 116 139;
+  --accent: 59 130 246;
+  --accent-hover: 37 99 235;
+}
+
+.dark {
+  --surface: 15 23 42;
+  --surface-muted: 30 41 59;
+  --ink: 248 250 252;
+  --ink-muted: 148 163 184;
+  --accent: 96 165 250;
+  --accent-hover: 147 197 253;
+}
+
+body {
+  @apply bg-surface font-sans text-ink antialiased;
+  margin: 0;
+  min-height: 100vh;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-accent/40 disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-white hover:bg-accent-hover;
+  }
+  .btn-secondary {
+    @apply btn border border-slate-300 bg-white text-ink hover:bg-slate-50 dark:border-slate-600 dark:bg-surface-muted dark:hover:bg-slate-700;
+  }
+  .btn-ghost {
+    @apply btn text-ink-muted hover:bg-slate-200/60 dark:hover:bg-slate-700/60;
+  }
+  .input {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-ink shadow-sm placeholder:text-ink-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent dark:border-slate-600 dark:bg-surface-muted;
+  }
+  .card {
+    @apply rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-surface-muted;
+  }
+  .label {
+    @apply mb-1 block text-xs font-medium uppercase tracking-wide text-ink-muted;
+  }
+}
