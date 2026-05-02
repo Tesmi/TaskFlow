@@ -64,8 +64,15 @@ Web app for **projects**, **team roles** (Admin / Member), and **tasks** (status
 6. **Client-side routing**  
    [`vercel.json`](vercel.json) rewrites `/*` to `/index.html` so React Router works on refresh and deep links.
 
-7. **Supabase Auth**  
-   In Supabase → **Authentication → URL configuration**, set **Site URL** to your Vercel URL (e.g. `https://your-app.vercel.app`) and add the same URL under **Redirect URLs** if you use email confirmation, magic links, or OAuth.
+7. **Supabase Auth URLs**  
+   In Supabase → **Authentication → URL configuration**:
+   - **Site URL:** your real app URL (e.g. `https://your-app.vercel.app`), not `http://localhost:5173`. This is the default used by auth emails if no redirect is specified.
+   - **Redirect URLs:** add every URL you use, or wildcards, for example:
+     - `http://localhost:5173/**` (Vite dev)
+     - `https://your-app.vercel.app/**`  
+     The signup flow sends `emailRedirectTo` to `/dashboard` on the **current** origin; that URL must match an allowed redirect pattern.
+
+   After changing these, new confirmation emails will point at the correct host. Old emails already sent still contain the old link.
 
 ## Security notes
 

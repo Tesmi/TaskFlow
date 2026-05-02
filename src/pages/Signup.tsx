@@ -25,6 +25,8 @@ export default function Signup() {
       email,
       password,
       options: {
+        // Uses the site you’re on (e.g. Vercel) so the email isn’t stuck on localhost.
+        emailRedirectTo: `${window.location.origin}/dashboard`,
         data: { display_name: displayName || undefined },
       },
     })
