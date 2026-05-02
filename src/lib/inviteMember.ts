@@ -1,8 +1,21 @@
-import { getFunctionsUrl, supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 export type InviteMemberResult =
   | { ok: true }
   | { ok: false; message: string }
+
+function deploymentHint(message: string): string {
+  const m = message.toLowerCase()
+  if (
+    m.includes('404') ||
+    m.includes('not found') ||
+    m.includes('failed to send') ||
+    m.includes('failed to fetch')
+  ) {
+    return `${message} — If this persists, deploy the Edge Function: supabase functions deploy add-project-member`
+  }
+  return message
+}
 
 /**
  * Adds an existing Supabase user to the project by email (admin-only; enforced by Edge Function + RLS).
@@ -12,38 +25,31 @@ export async function inviteMemberByEmail(
   email: string,
   role: 'admin' | 'member' = 'member'
 ): Promise<InviteMemberResult> {
-  const base = getFunctionsUrl()
+  const url = import.meta.env.VITE_SUPABASE_URL
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-  if (!base || !anonKey) {
+  if (!url || !anonKey) {
     return { ok: false, message: 'Supabase is not configured.' }
   }
 
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-  const token = sessionData.session?.access_token
-  if (sessionError || !token) {
+  if (sessionError || !sessionData.session) {
     return { ok: false, message: 'You must be signed in.' }
   }
 
-  const res = await fetch(`${base}/add-project-member`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      apikey: anonKey,
-    },
-    body: JSON.stringify({ project_id: projectId, email: email.trim(), role }),
+  const { data, error } = await supabase.functions.invoke<{
+    ok?: boolean
+    error?: string
+    user_id?: string
+  }>('add-project-member', {
+    body: { project_id: projectId, email: email.trim(), role },
   })
 
-  const raw = await res.text()
-  let body: { ok?: boolean; error?: string } = {}
-  try {
-    body = raw ? (JSON.parse(raw) as { ok?: boolean; error?: string }) : {}
-  } catch {
-    return { ok: false, message: `Request failed (${res.status})` }
+  if (error) {
+    return { ok: false, message: deploymentHint(error.message) }
   }
 
-  if (!res.ok) {
-    return { ok: false, message: body.error ?? `Request failed (${res.status})` }
+  if (data && typeof data === 'object' && 'error' in data && data.error) {
+    return { ok: false, message: String(data.error) }
   }
 
   return { ok: true }

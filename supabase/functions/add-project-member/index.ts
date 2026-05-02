@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
@@ -84,12 +85,13 @@ Deno.serve(async (req: Request) => {
     );
 
     if (!target) {
+      // Use 400, not 404 — HTTP 404 looks like “function missing” and browsers often show a CORS error for gateway 404s.
       return json(
         {
           error:
             "No user found with that email. They must sign up before you can add them.",
         },
-        404,
+        400,
       );
     }
 

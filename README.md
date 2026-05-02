@@ -21,13 +21,16 @@ Web app for **projects**, **team roles** (Admin / Member), and **tasks** (status
    - Or use the CLI: `supabase db push` (after `supabase link`).
 
 5. **Edge Function: add member by email**  
-   Admins add existing users (matched by email) via the `add-project-member` function.
+   Admins add existing users (matched by email) via the `add-project-member` function. **You must deploy it** or “Add member” returns **404** (and the browser may show a **CORS** warning because the gateway 404 response lacks CORS headers).
+
+   From your machine (with [Supabase CLI](https://supabase.com/docs/guides/cli) logged in and linked to this project):
 
    ```bash
+   cd taskflow
    supabase functions deploy add-project-member
    ```
 
-   The platform injects `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` for Edge Functions. No service role key is used in the browser.
+   The platform injects `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` into the function at runtime. Never put the **service role** key in the frontend env.
 
 6. **Environment file**
 
